@@ -2,6 +2,8 @@
 
 A reusable personal list template for items, optional posters, and archived things. Inspired by [Curated Supply](https://www.curated.supply/): use it to list items you like, want to buy, or want to keep track of. The visual style is intentionally plain black and white, and the site name, owner, description, about text, feature flags, and storage bucket are configured through environment variables.
 
+My own site using this template is [juliuslist.com](https://juliuslist.com).
+
 ## Features
 
 - Public item collection
