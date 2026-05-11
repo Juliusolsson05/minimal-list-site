@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- White background -->
+  <rect width="32" height="32" fill="#FFFFFF"/>
+
+  <!-- Black "J" letter in Inter font style -->
+  <text
+    x="16"
+    y="24"
+    font-family="Inter, system-ui, -apple-system, sans-serif"
+    font-size="24"
+    font-weight="300"
+    text-anchor="middle"
+    fill="#000000"
+  >J</text>
+</svg>

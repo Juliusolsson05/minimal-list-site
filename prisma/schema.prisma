@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Category {
+  id    String @id @default(cuid())
+  name  String @unique
+  slug  String @unique
+  items Item[]
+
+  @@index([slug])
+}
+
+model Item {
+  id               String    @id @default(cuid())
+  name             String
+  slug             String    @unique
+  description      String
+  details          String
+  price            String?
+  imageUrl         String
+  imageOriginalUrl String?
+  link             String?
+  categoryId       String
+  archivedAt       DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @default(now()) @updatedAt
+  category         Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([categoryId])
+  @@index([slug])
+  @@index([archivedAt])
+}
+
+model Poster {
+  id               String    @id @default(cuid())
+  name             String
+  slug             String    @unique
+  description      String
+  imageUrl         String
+  imageOriginalUrl String?
+  archivedAt       DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @default(now()) @updatedAt
+
+  @@index([slug])
+  @@index([archivedAt])
+}

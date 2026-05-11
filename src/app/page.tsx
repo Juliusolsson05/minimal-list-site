@@ -1,0 +1,94 @@
+import { prisma } from "@/lib/prisma";
+import HomePage from "@/components/HomePage";
+
+export const dynamic = 'force-dynamic';
+// Revalidate every hour (3600s) - use on-demand revalidation for instant updates
+export const revalidate = 3600;
+
+export default async function Home() {
+  const [items, categories, posters] = await Promise.all([
+    prisma.item.findMany({
+      where: { archivedAt: null },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        description: true,
+        price: true,
+        link: true,
+        details: true,
+        imageUrl: true,
+        category: {
+          select: {
+            slug: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 60, // Limit initial load
+    }),
+    prisma.category.findMany({
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+      },
+      orderBy: {
+        name: 'asc',
+      },
+    }),
+    prisma.poster.findMany({
+      where: { archivedAt: null },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        description: true,
+        imageUrl: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 30, // Limit initial load
+    }),
+  ]);
+
+  // Transform items to use direct Storage URLs
+  const transformedItems = items.map((item) => ({
+    id: item.id,
+    slug: item.slug,
+    name: item.name,
+    category: item.category.slug,
+    description: item.description,
+    price: item.price,
+    image: item.imageUrl,
+    link: item.link,
+    details: item.details,
+  }));
+
+  // Transform posters to use direct Storage URLs
+  const transformedPosters = posters.map((poster) => ({
+    id: poster.id,
+    slug: poster.slug,
+    name: poster.name,
+    description: poster.description,
+    image: poster.imageUrl,
+  }));
+
+  // Hardcode category order for better UX
+  const categoryOrder = ['all', 'furniture', 'tech', 'fashion', 'lifestyle', 'accessories'];
+  const sortedCategories = categoryOrder
+    .map(slug => categories.find(c => c.slug === slug))
+    .filter((c): c is typeof categories[0] => c !== undefined);
+
+  // Add Posters as a separate view
+  const categoriesWithExtras = [
+    ...sortedCategories,
+    { id: 'posters', name: 'Posters', slug: 'posters' },
+  ];
+
+  return <HomePage items={transformedItems} categories={categoriesWithExtras} posters={transformedPosters} />;
+}
