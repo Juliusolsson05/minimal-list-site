@@ -25,6 +25,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LogOut, Edit, Trash2, Package, ImageIcon, Sparkles, Archive, ArchiveRestore } from "lucide-react";
 import AdminPostersManager from "@/components/AdminPostersManager";
 import AIProductCreator from "@/components/AIProductCreator";
+import { siteConfig } from "@/lib/site-config";
 
 interface Item {
   id: string;
@@ -93,6 +94,8 @@ export default function AdminDashboard({ items: initialItems, categories, poster
   const [isLoading, setIsLoading] = useState(false);
   const [uploadedItemImage, setUploadedItemImage] = useState<string | null>(null);
   const [uploadedItemImageOriginal, setUploadedItemImageOriginal] = useState<string | null>(null);
+  const [useAiBackgroundRemoval, setUseAiBackgroundRemoval] = useState(false);
+  const [isProcessingImage, setIsProcessingImage] = useState(false);
   const [showAICreator, setShowAICreator] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -121,14 +124,44 @@ export default function AdminDashboard({ items: initialItems, categories, poster
     setEditingItem(null);
     setUploadedItemImage(null);
     setUploadedItemImageOriginal(null);
+    setUseAiBackgroundRemoval(false);
   };
 
-  const handleItemImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleItemImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        setUploadedItemImage(e.target?.result as string);
+      reader.onload = async (event) => {
+        const originalImage = event.target?.result as string;
+        setUploadedItemImageOriginal(originalImage);
+
+        if (!useAiBackgroundRemoval || !siteConfig.features.ai) {
+          setUploadedItemImage(originalImage);
+          return;
+        }
+
+        setIsProcessingImage(true);
+        try {
+          const response = await fetch('/api/ai/generate-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              image: originalImage,
+              targetItem: formData.name,
+            }),
+          });
+
+          if (!response.ok) throw new Error('Failed to process image');
+
+          const data = await response.json();
+          setUploadedItemImage(data.image || originalImage);
+        } catch (error) {
+          console.error("Error processing image:", error);
+          alert("AI image processing failed. Using the original image instead.");
+          setUploadedItemImage(originalImage);
+        } finally {
+          setIsProcessingImage(false);
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -299,10 +332,12 @@ export default function AdminDashboard({ items: initialItems, categories, poster
               <Package className="h-4 w-4" />
               Items
             </TabsTrigger>
-            <TabsTrigger value="posters" className="gap-2">
-              <ImageIcon className="h-4 w-4" />
-              Posters
-            </TabsTrigger>
+            {siteConfig.features.posters && (
+              <TabsTrigger value="posters" className="gap-2">
+                <ImageIcon className="h-4 w-4" />
+                Posters
+              </TabsTrigger>
+            )}
           </TabsList>
 
           <TabsContent value="items" className="space-y-8">
@@ -313,13 +348,24 @@ export default function AdminDashboard({ items: initialItems, categories, poster
                   Manage your curated collection
                 </p>
               </div>
-              <Button
-                onClick={() => setShowAICreator(true)}
-                className="bg-foreground text-background hover:bg-foreground/90"
-              >
-                <Sparkles className="h-4 w-4 mr-2" />
-                Add Item with AI
-              </Button>
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => handleOpenDialog()}
+                  className="border-border"
+                >
+                  Add Item
+                </Button>
+                {siteConfig.features.ai && (
+                  <Button
+                    onClick={() => setShowAICreator(true)}
+                    className="bg-foreground text-background hover:bg-foreground/90"
+                  >
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Add with AI
+                  </Button>
+                )}
+              </div>
             </div>
 
         {/* Items Table */}
@@ -423,9 +469,11 @@ export default function AdminDashboard({ items: initialItems, categories, poster
         </div>
           </TabsContent>
 
-          <TabsContent value="posters">
-            <AdminPostersManager posters={posters} />
-          </TabsContent>
+          {siteConfig.features.posters && (
+            <TabsContent value="posters">
+              <AdminPostersManager posters={posters} />
+            </TabsContent>
+          )}
 
         </Tabs>
       </main>
@@ -523,6 +571,18 @@ export default function AdminDashboard({ items: initialItems, categories, poster
 
             <div className="space-y-2">
               <Label htmlFor="item-image">Product Image</Label>
+              {siteConfig.features.ai && (
+                <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <input
+                    type="checkbox"
+                    checked={useAiBackgroundRemoval}
+                    onChange={(e) => setUseAiBackgroundRemoval(e.target.checked)}
+                    disabled={isLoading || isProcessingImage}
+                    className="h-4 w-4"
+                  />
+                  Use AI background removal / studio image
+                </label>
+              )}
               <div className="border-2 border-dashed border-border rounded-lg p-4 text-center hover:border-foreground/20 transition-colors">
                 <input
                   type="file"
@@ -530,13 +590,15 @@ export default function AdminDashboard({ items: initialItems, categories, poster
                   accept="image/*"
                   onChange={handleItemImageUpload}
                   className="hidden"
-                  disabled={isLoading}
+                  disabled={isLoading || isProcessingImage}
                 />
                 <label
                   htmlFor="item-image"
                   className="cursor-pointer block space-y-2"
                 >
-                  {uploadedItemImage || editingItem ? (
+                  {isProcessingImage ? (
+                    <p className="text-sm text-muted-foreground">Processing image...</p>
+                  ) : uploadedItemImage || editingItem ? (
                     <div className="space-y-2">
                       {uploadedItemImage && (
                         <img
@@ -582,7 +644,7 @@ export default function AdminDashboard({ items: initialItems, categories, poster
                 type="button"
                 variant="outline"
                 onClick={handleCloseDialog}
-                disabled={isLoading}
+                disabled={isLoading || isProcessingImage}
               >
                 Cancel
               </Button>

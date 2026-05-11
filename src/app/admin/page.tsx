@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import AdminDashboard from "@/components/AdminDashboard";
 import { prisma } from "@/lib/prisma";
+import { siteConfig } from "@/lib/site-config";
 
 export const dynamic = 'force-dynamic';
 
@@ -55,21 +56,23 @@ export default async function AdminPage() {
         name: 'asc',
       },
     }),
-    prisma.poster.findMany({
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        description: true,
-        imageUrl: true,
-        archivedAt: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    }),
+    siteConfig.features.posters
+      ? prisma.poster.findMany({
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            description: true,
+            imageUrl: true,
+            archivedAt: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+        })
+      : Promise.resolve([]),
   ]);
 
   return <AdminDashboard items={items} categories={categories} posters={posters} user={session.user} />;

@@ -37,6 +37,18 @@ export default function About() {
               <p>
                 {siteConfig.about}
               </p>
+              <p>
+                Inspired by{" "}
+                <a
+                  href="https://www.curated.supply/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-foreground underline hover:opacity-70 transition-opacity"
+                >
+                  Curated Supply
+                </a>
+                {" "}as a simple way to list things you like, want to buy, or want to keep track of.
+              </p>
 
               <div className="pt-4 space-y-3">
                 <p className="text-foreground font-medium">

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import HomePage from "@/components/HomePage";
+import { siteConfig } from "@/lib/site-config";
 
 export const dynamic = 'force-dynamic';
 // Revalidate every hour (3600s) - use on-demand revalidation for instant updates
@@ -40,20 +41,22 @@ export default async function Home() {
         name: 'asc',
       },
     }),
-    prisma.poster.findMany({
-      where: { archivedAt: null },
-      select: {
-        id: true,
-        slug: true,
-        name: true,
-        description: true,
-        imageUrl: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      take: 30, // Limit initial load
-    }),
+    siteConfig.features.posters
+      ? prisma.poster.findMany({
+          where: { archivedAt: null },
+          select: {
+            id: true,
+            slug: true,
+            name: true,
+            description: true,
+            imageUrl: true,
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+          take: 30, // Limit initial load
+        })
+      : Promise.resolve([]),
   ]);
 
   // Transform items to use direct Storage URLs
@@ -87,7 +90,7 @@ export default async function Home() {
   // Add Posters as a separate view
   const categoriesWithExtras = [
     ...sortedCategories,
-    { id: 'posters', name: 'Posters', slug: 'posters' },
+    ...(siteConfig.features.posters ? [{ id: 'posters', name: 'Posters', slug: 'posters' }] : []),
   ];
 
   return <HomePage items={transformedItems} categories={categoriesWithExtras} posters={transformedPosters} />;

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { siteConfig } from '@/lib/site-config';
 
 // On-demand revalidation endpoint for instant cache updates
 // Called after content changes to rebuild static pages
@@ -28,8 +29,11 @@ export async function POST(request: NextRequest) {
       }
       // Also revalidate dynamic routes
       revalidatePath('/item/[id]', 'page');
-      revalidatePath('/poster/[id]', 'page');
-      revalidated.push('/item/[id]', '/poster/[id]');
+      revalidated.push('/item/[id]');
+      if (siteConfig.features.posters) {
+        revalidatePath('/poster/[id]', 'page');
+        revalidated.push('/poster/[id]');
+      }
     }
 
     // Revalidate specific paths

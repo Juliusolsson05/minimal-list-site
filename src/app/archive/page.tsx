@@ -57,18 +57,20 @@ export default async function ArchivePage() {
       },
       orderBy: { archivedAt: "desc" },
     }),
-    prisma.poster.findMany({
-      where: { archivedAt: { not: null } },
-      select: {
-        id: true,
-        slug: true,
-        name: true,
-        description: true,
-        imageUrl: true,
-        archivedAt: true,
-      },
-      orderBy: { archivedAt: "desc" },
-    }),
+    siteConfig.features.posters
+      ? prisma.poster.findMany({
+          where: { archivedAt: { not: null } },
+          select: {
+            id: true,
+            slug: true,
+            name: true,
+            description: true,
+            imageUrl: true,
+            archivedAt: true,
+          },
+          orderBy: { archivedAt: "desc" },
+        })
+      : Promise.resolve([]),
   ]);
 
   const entries: ArchivedEntry[] = [

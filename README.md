@@ -1,16 +1,18 @@
 # Minimal List Site
 
-A reusable personal list template for items, posters, and archived things. The visual style is intentionally plain black and white, and the site name, owner, description, about text, and storage bucket are configured through environment variables.
+A reusable personal list template for items, optional posters, and archived things. Inspired by [Curated Supply](https://www.curated.supply/): use it to list items you like, want to buy, or want to keep track of. The visual style is intentionally plain black and white, and the site name, owner, description, about text, feature flags, and storage bucket are configured through environment variables.
 
 ## Features
 
-- Public item and poster collections
+- Public item collection
+- Optional poster collection
 - Archive page for hidden or old entries
 - Admin dashboard for creating, editing, archiving, and deleting content
 - NextAuth password login
 - Prisma/Postgres database
 - Supabase Storage image uploads
 - Optional OpenRouter AI helpers with Gemini fallback
+- Optional AI background removal / studio image checkbox when uploading items
 - Vercel-ready Next.js app
 
 ## Local Setup
@@ -66,6 +68,9 @@ Required production variables:
 - `NEXT_PUBLIC_SITE_OWNER`
 - `NEXT_PUBLIC_SITE_DESCRIPTION`
 - `NEXT_PUBLIC_SITE_ABOUT`
+- `NEXT_PUBLIC_ENABLE_POSTERS`
+- `NEXT_PUBLIC_ENABLE_MUSIC`
+- `NEXT_PUBLIC_ENABLE_AI`
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
@@ -79,6 +84,8 @@ Optional AI variables:
 ## Customize
 
 - Change the public site text through the `NEXT_PUBLIC_SITE_*` variables.
+- Toggle optional surfaces through `NEXT_PUBLIC_ENABLE_POSTERS`, `NEXT_PUBLIC_ENABLE_MUSIC`, and `NEXT_PUBLIC_ENABLE_AI`.
+- Keep `NEXT_PUBLIC_ENABLE_AI=false` if you want normal manual uploads only.
 - Change categories and demo content in `prisma/seed.ts`.
 - Create the Supabase Storage bucket named by `SUPABASE_STORAGE_BUCKET`.
 - Keep real credentials in environment variables only. Do not commit `.env` files or deployment exports.
