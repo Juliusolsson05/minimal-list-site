@@ -14,7 +14,7 @@ export default async function AdminPage() {
     redirect("/admin/login");
   }
 
-  const [items, categories, posters] = await Promise.all([
+  const [items, categories, posters, songs] = await Promise.all([
     prisma.item.findMany({
       select: {
         id: true,
@@ -73,7 +73,27 @@ export default async function AdminPage() {
           },
         })
       : Promise.resolve([]),
+    siteConfig.features.music
+      ? prisma.song.findMany({
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            artist: true,
+            album: true,
+            imageUrl: true,
+            link: true,
+            addedAt: true,
+            archivedAt: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+          orderBy: {
+            addedAt: 'desc',
+          },
+        })
+      : Promise.resolve([]),
   ]);
 
-  return <AdminDashboard items={items} categories={categories} posters={posters} user={session.user} />;
+  return <AdminDashboard items={items} categories={categories} posters={posters} songs={songs} user={session.user} />;
 }

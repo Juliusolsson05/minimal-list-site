@@ -13,7 +13,7 @@ My own site using this template is [juliuslist.com](https://juliuslist.com).
 
 ## Why It Is Useful
 
-Most personal list sites are either too generic or too much work to maintain. This template is a practical middle ground: a public list, a private admin, image uploads, categories, archive support, and optional AI helpers.
+Most personal list sites are either too generic or too much work to maintain. This template is a practical middle ground: a public list, posters, music, a private admin, image uploads, archive support, and optional AI helpers.
 
 The AI parts are opt-in. Leave `NEXT_PUBLIC_ENABLE_AI=false` and it behaves like a normal CMS. Turn AI on and the admin can help with:
 
@@ -24,14 +24,19 @@ The AI parts are opt-in. Leave `NEXT_PUBLIC_ENABLE_AI=false` and it behaves like
 
 ## Screenshots
 
-| Home | Archive |
+| Home | Posters |
 | --- | --- |
-| ![Home screenshot](public/readme/home.png) | ![Archive screenshot](public/readme/archive.png) |
+| ![Home screenshot](public/readme/home.png) | ![Posters screenshot](public/readme/posters.png) |
+
+| Music | Archive |
+| --- | --- |
+| ![Music screenshot](public/readme/music.png) | ![Archive screenshot](public/readme/archive.png) |
 
 ## Features
 
 - Public item collection with categories and search
 - Optional poster collection
+- Optional music collection
 - Archive page for old or hidden entries
 - Password-protected admin dashboard
 - Supabase Storage uploads
@@ -62,7 +67,7 @@ Full setup notes are in [docs/setup.md](docs/setup.md).
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `NEXT_PUBLIC_ENABLE_POSTERS` | `true` | Shows the poster collection and admin poster tools. |
-| `NEXT_PUBLIC_ENABLE_MUSIC` | `false` | Reserved for clones that want to add a music surface. |
+| `NEXT_PUBLIC_ENABLE_MUSIC` | `true` | Shows the music collection and admin music tools. |
 | `NEXT_PUBLIC_ENABLE_AI` | `false` | Shows AI item creation and AI image cleanup controls. |
 
 ## Scripts

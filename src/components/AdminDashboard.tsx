@@ -22,8 +22,9 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Edit, Trash2, Package, ImageIcon, Sparkles, Archive, ArchiveRestore } from "lucide-react";
+import { LogOut, Edit, Trash2, Package, ImageIcon, Sparkles, Archive, ArchiveRestore, Music } from "lucide-react";
 import AdminPostersManager from "@/components/AdminPostersManager";
+import AdminMusicManager from "@/components/AdminMusicManager";
 import AIProductCreator from "@/components/AIProductCreator";
 import { siteConfig } from "@/lib/site-config";
 
@@ -69,10 +70,25 @@ interface Poster {
   updatedAt: Date;
 }
 
+interface Song {
+  id: string;
+  slug: string;
+  name: string;
+  artist: string;
+  album: string | null;
+  imageUrl: string;
+  link: string | null;
+  addedAt: Date;
+  archivedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 interface AdminDashboardProps {
   items: Item[];
   categories: Category[];
   posters: Poster[];
+  songs: Song[];
   user: User;
 }
 
@@ -86,7 +102,7 @@ type FormData = {
   categoryId: string;
 };
 
-export default function AdminDashboard({ items: initialItems, categories, posters, user }: AdminDashboardProps) {
+export default function AdminDashboard({ items: initialItems, categories, posters, songs, user }: AdminDashboardProps) {
   const router = useRouter();
   const [items, setItems] = useState(initialItems);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -338,6 +354,12 @@ export default function AdminDashboard({ items: initialItems, categories, poster
                 Posters
               </TabsTrigger>
             )}
+            {siteConfig.features.music && (
+              <TabsTrigger value="music" className="gap-2">
+                <Music className="h-4 w-4" />
+                Music
+              </TabsTrigger>
+            )}
           </TabsList>
 
           <TabsContent value="items" className="space-y-8">
@@ -472,6 +494,12 @@ export default function AdminDashboard({ items: initialItems, categories, poster
           {siteConfig.features.posters && (
             <TabsContent value="posters">
               <AdminPostersManager posters={posters} />
+            </TabsContent>
+          )}
+
+          {siteConfig.features.music && (
+            <TabsContent value="music">
+              <AdminMusicManager songs={songs} />
             </TabsContent>
           )}
 

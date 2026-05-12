@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import CategoryFilter from "@/components/CategoryFilter";
 import ItemGrid from "@/components/ItemGrid";
 import PosterGrid from "@/components/PosterGrid";
+import MusicGrid from "@/components/MusicGrid";
 import Footer from "@/components/Footer";
 
 interface Item {
@@ -33,20 +34,32 @@ interface Poster {
   image: string;
 }
 
+interface Song {
+  id: string;
+  slug: string;
+  name: string;
+  artist: string;
+  album?: string | null;
+  image: string;
+  link?: string | null;
+  addedAt: string;
+}
+
 interface HomePageProps {
   items: Item[];
   categories: Category[];
   posters: Poster[];
+  songs: Song[];
 }
 
-export default function HomePage({ items, categories, posters }: HomePageProps) {
+export default function HomePage({ items, categories, posters, songs }: HomePageProps) {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredItems = useMemo(() => {
     let filtered = items;
 
-    if (selectedCategory !== "all" && selectedCategory !== "posters") {
+    if (selectedCategory !== "all" && selectedCategory !== "posters" && selectedCategory !== "music") {
       filtered = filtered.filter((item) => item.category === selectedCategory);
     }
 
@@ -75,6 +88,17 @@ export default function HomePage({ items, categories, posters }: HomePageProps) 
     });
   }, [posters, searchQuery]);
 
+  const filteredSongs = useMemo(() => {
+    if (!searchQuery) return songs;
+
+    const searchTerms = searchQuery.toLowerCase().split(" ").filter(term => term.length > 0);
+
+    return songs.filter((song) => {
+      const searchableText = `${song.name} ${song.artist} ${song.album || ""}`.toLowerCase();
+      return searchTerms.some(term => searchableText.includes(term));
+    });
+  }, [songs, searchQuery]);
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
@@ -86,6 +110,8 @@ export default function HomePage({ items, categories, posters }: HomePageProps) 
       <div className="flex-1">
         {selectedCategory === "posters" ? (
           <PosterGrid posters={filteredPosters} />
+        ) : selectedCategory === "music" ? (
+          <MusicGrid songs={filteredSongs} />
         ) : (
           <ItemGrid items={filteredItems} />
         )}

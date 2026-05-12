@@ -33,7 +33,7 @@ NEXT_PUBLIC_SITE_DESCRIPTION=""
 NEXT_PUBLIC_SITE_ABOUT=""
 
 NEXT_PUBLIC_ENABLE_POSTERS="true"
-NEXT_PUBLIC_ENABLE_MUSIC="false"
+NEXT_PUBLIC_ENABLE_MUSIC="true"
 NEXT_PUBLIC_ENABLE_AI="false"
 
 NEXT_PUBLIC_SUPABASE_URL=""
@@ -77,7 +77,7 @@ The default example value is:
 SUPABASE_STORAGE_BUCKET="minimal-list"
 ```
 
-Uploaded item and poster images are stored in that bucket.
+Uploaded item, poster, and music cover images are stored in that bucket.
 
 ## Customization
 

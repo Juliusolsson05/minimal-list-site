@@ -72,3 +72,8 @@ export function getItemImagePath(itemId: string, original: boolean = false): str
 export function getPosterImagePath(posterId: string, original: boolean = false): string {
   return `posters/${posterId}${original ? '-original' : ''}.jpg`;
 }
+
+// Helper to generate storage path for music cover art
+export function getSongImagePath(songId: string): string {
+  return `songs/${songId}.jpg`;
+}

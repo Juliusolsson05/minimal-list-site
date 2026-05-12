@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 3600;
 
 export default async function Home() {
-  const [items, categories, posters] = await Promise.all([
+  const [items, categories, posters, songs] = await Promise.all([
     prisma.item.findMany({
       where: { archivedAt: null },
       select: {
@@ -57,6 +57,25 @@ export default async function Home() {
           take: 30, // Limit initial load
         })
       : Promise.resolve([]),
+    siteConfig.features.music
+      ? prisma.song.findMany({
+          where: { archivedAt: null },
+          select: {
+            id: true,
+            slug: true,
+            name: true,
+            artist: true,
+            album: true,
+            imageUrl: true,
+            link: true,
+            addedAt: true,
+          },
+          orderBy: {
+            addedAt: 'desc',
+          },
+          take: 60,
+        })
+      : Promise.resolve([]),
   ]);
 
   // Transform items to use direct Storage URLs
@@ -81,6 +100,21 @@ export default async function Home() {
     image: poster.imageUrl,
   }));
 
+  const transformedSongs = songs.map((song) => ({
+    id: song.id,
+    slug: song.slug,
+    name: song.name,
+    artist: song.artist,
+    album: song.album,
+    image: song.imageUrl,
+    link: song.link,
+    addedAt: song.addedAt.toLocaleDateString("en", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }),
+  }));
+
   // Hardcode category order for better UX
   const categoryOrder = ['all', 'furniture', 'tech', 'fashion', 'lifestyle', 'accessories'];
   const sortedCategories = categoryOrder
@@ -91,7 +125,8 @@ export default async function Home() {
   const categoriesWithExtras = [
     ...sortedCategories,
     ...(siteConfig.features.posters ? [{ id: 'posters', name: 'Posters', slug: 'posters' }] : []),
+    ...(siteConfig.features.music ? [{ id: 'music', name: 'Music', slug: 'music' }] : []),
   ];
 
-  return <HomePage items={transformedItems} categories={categoriesWithExtras} posters={transformedPosters} />;
+  return <HomePage items={transformedItems} categories={categoriesWithExtras} posters={transformedPosters} songs={transformedSongs} />;
 }

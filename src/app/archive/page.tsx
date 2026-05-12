@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import Footer from "@/components/Footer";
 import ItemCard from "@/components/ItemCard";
 import PosterCard from "@/components/PosterCard";
+import MusicCard from "@/components/MusicCard";
 import { siteConfig } from "@/lib/site-config";
 
 export const dynamic = 'force-dynamic';
@@ -37,10 +38,25 @@ type ArchivedPoster = {
   };
 };
 
-type ArchivedEntry = ArchivedItem | ArchivedPoster;
+type ArchivedSong = {
+  kind: "song";
+  archivedAt: Date;
+  data: {
+    id: string;
+    slug: string;
+    name: string;
+    artist: string;
+    album: string | null;
+    image: string;
+    link: string | null;
+    addedAt: string;
+  };
+};
+
+type ArchivedEntry = ArchivedItem | ArchivedPoster | ArchivedSong;
 
 export default async function ArchivePage() {
-  const [items, posters] = await Promise.all([
+  const [items, posters, songs] = await Promise.all([
     prisma.item.findMany({
       where: { archivedAt: { not: null } },
       select: {
@@ -66,6 +82,23 @@ export default async function ArchivePage() {
             name: true,
             description: true,
             imageUrl: true,
+            archivedAt: true,
+          },
+          orderBy: { archivedAt: "desc" },
+        })
+      : Promise.resolve([]),
+    siteConfig.features.music
+      ? prisma.song.findMany({
+          where: { archivedAt: { not: null } },
+          select: {
+            id: true,
+            slug: true,
+            name: true,
+            artist: true,
+            album: true,
+            imageUrl: true,
+            link: true,
+            addedAt: true,
             archivedAt: true,
           },
           orderBy: { archivedAt: "desc" },
@@ -98,6 +131,24 @@ export default async function ArchivePage() {
         name: p.name,
         description: p.description,
         image: p.imageUrl,
+      },
+    })),
+    ...songs.map<ArchivedSong>((song) => ({
+      kind: "song",
+      archivedAt: song.archivedAt!,
+      data: {
+        id: song.id,
+        slug: song.slug,
+        name: song.name,
+        artist: song.artist,
+        album: song.album,
+        image: song.imageUrl,
+        link: song.link,
+        addedAt: song.addedAt.toLocaleDateString("en", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        }),
       },
     })),
   ].sort((a, b) => b.archivedAt.getTime() - a.archivedAt.getTime());
@@ -142,8 +193,10 @@ export default async function ArchivePage() {
               {entries.map((entry) =>
                 entry.kind === "item" ? (
                   <ItemCard key={`item-${entry.data.id}`} item={entry.data} />
-                ) : (
+                ) : entry.kind === "poster" ? (
                   <PosterCard key={`poster-${entry.data.id}`} poster={entry.data} />
+                ) : (
+                  <MusicCard key={`song-${entry.data.id}`} song={entry.data} />
                 )
               )}
             </div>

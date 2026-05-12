@@ -16,6 +16,8 @@ async function main() {
   console.log('Seeding database...');
 
   await prisma.item.deleteMany();
+  await prisma.poster.deleteMany();
+  await prisma.song.deleteMany();
   await prisma.category.deleteMany();
   await prisma.user.deleteMany();
 
@@ -117,6 +119,38 @@ async function main() {
       });
     })
   );
+
+  await prisma.song.createMany({
+    data: [
+      {
+        name: 'Sample Track',
+        slug: 'sample-track',
+        artist: 'Sample Artist',
+        album: 'Sample Album',
+        imageUrl: '/sample-album-1.svg',
+        link: null,
+        addedAt: new Date('2024-06-03'),
+      },
+      {
+        name: 'Reference Song',
+        slug: 'reference-song',
+        artist: 'Template Artist',
+        album: 'Reference Collection',
+        imageUrl: '/sample-album-2.svg',
+        link: null,
+        addedAt: new Date('2023-07-01'),
+      },
+      {
+        name: 'Rotation Note',
+        slug: 'rotation-note',
+        artist: 'Demo Artist',
+        album: 'Demo Rotation',
+        imageUrl: '/sample-album-3.svg',
+        link: null,
+        addedAt: new Date('2024-06-30'),
+      },
+    ],
+  });
 
   console.log('Seed completed');
 }
