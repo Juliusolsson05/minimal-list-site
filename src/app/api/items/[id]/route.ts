@@ -80,7 +80,7 @@ export async function PUT(
     if (image) {
       const parsedImage = parseBase64Image(image, imageType || 'image/jpeg');
 
-      // Upload to Supabase Storage (overwrites existing file at same path)
+      // Upload to configured storage (overwrites existing file at same path)
       const imagePath = getItemImagePath(id, false);
       const { url: imageUrl } = await uploadImage(imagePath, parsedImage.buffer, parsedImage.mimeType);
       updateData.imageUrl = imageUrl;
@@ -90,7 +90,7 @@ export async function PUT(
     if (imageOriginal) {
       const parsedOriginalImage = parseBase64Image(imageOriginal, imageOriginalType || 'image/jpeg');
 
-      // Upload to Supabase Storage (overwrites existing file at same path)
+      // Upload to configured storage (overwrites existing file at same path)
       const originalPath = getItemImagePath(id, true);
       const { url: imageOriginalUrl } = await uploadImage(originalPath, parsedOriginalImage.buffer, parsedOriginalImage.mimeType);
       updateData.imageOriginalUrl = imageOriginalUrl;

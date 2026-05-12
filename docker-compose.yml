@@ -1,48 +1,23 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: minimal-list-db
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: minimal_list
-    ports:
-      - '5432:5432'
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: minimal-list-app
     restart: always
-    depends_on:
-      postgres:
-        condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/minimal_list
-      DIRECT_URL: postgresql://postgres:postgres@postgres:5432/minimal_list
+      DATABASE_URL: file:./dev.db
       NEXTAUTH_URL: http://localhost:3000
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:?Set NEXTAUTH_SECRET}
       ADMIN_EMAIL: ${ADMIN_EMAIL:?Set ADMIN_EMAIL}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD}
-      GUESTBOOK_PASSWORD: ${GUESTBOOK_PASSWORD:?Set GUESTBOOK_PASSWORD}
+      STORAGE_DRIVER: local
     ports:
       - '3000:3000'
     volumes:
       - ./public:/app/public
       - ./src:/app/src
       - ./prisma:/app/prisma
-    command: sh -c "npx prisma migrate deploy && npx prisma db seed && npm run dev"
-
-volumes:
-  postgres_data:
+    command: sh -c "npx prisma db push && npx prisma db seed && npm run dev"

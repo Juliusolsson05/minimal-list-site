@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
 
     const parsedImage = parseBase64Image(image, imageType || 'image/jpeg');
 
-    // Upload main image to Supabase Storage
+    // Upload main image to configured storage
     const imagePath = getItemImagePath(itemId, false);
     const { url: imageUrl } = await uploadImage(imagePath, parsedImage.buffer, parsedImage.mimeType);
 

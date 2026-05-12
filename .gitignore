@@ -21,6 +21,10 @@ dist-ssr
 # misc
 .DS_Store
 *.pem
+prisma/dev.db
+prisma/dev.db-journal
+prisma/*.db
+prisma/*.db-journal
 
 # debug
 npm-debug.log*

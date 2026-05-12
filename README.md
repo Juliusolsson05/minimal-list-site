@@ -39,28 +39,26 @@ The AI parts are opt-in. Leave `NEXT_PUBLIC_ENABLE_AI=false` and it behaves like
 - Optional music collection
 - Archive page for old or hidden entries
 - Password-protected admin dashboard
-- Supabase Storage uploads
+- Local uploads by default, Supabase Storage for production
 - Optional OpenRouter AI helpers with Gemini fallback
 - Env-based site name, owner, description, about copy, bucket, and feature flags
 - Vercel-ready Next.js app
 
 ## Stack
 
-Next.js App Router, React, TypeScript, Tailwind CSS, Prisma, Postgres, Supabase Storage, and NextAuth.
+Next.js App Router, React, TypeScript, Tailwind CSS, Prisma, SQLite locally, Postgres/Supabase for production, and NextAuth.
 
 ## Quick Start
 
 ```bash
-pnpm install
 cp .env.example .env
-pnpm db:migrate
-pnpm db:seed
+pnpm setup
 pnpm dev
 ```
 
 Open `http://localhost:3000`.
 
-Full setup notes are in [docs/setup.md](docs/setup.md).
+This uses SQLite and local file uploads by default. Full setup notes are in [docs/setup.md](docs/setup.md), and agent-specific setup guidance is in [instructions.md](instructions.md).
 
 ## Feature Flags
 
@@ -78,7 +76,8 @@ pnpm build        # Build for production
 pnpm lint         # Run ESLint
 pnpm typecheck    # Run TypeScript
 pnpm audit --prod # Check production dependency advisories
-pnpm db:migrate   # Apply Prisma migrations
+pnpm db:setup     # Create/update local SQLite DB and seed demo content
+pnpm db:push      # Push the local SQLite schema
 pnpm db:seed      # Seed admin user and demo content
 ```
 

@@ -6,8 +6,8 @@ This guide covers the parts intentionally left out of the short README.
 
 - Node.js
 - pnpm
-- Postgres database
-- Supabase project with Storage enabled
+- SQLite for local development
+- Postgres and Supabase Storage for production deployments
 
 ## Environment
 
@@ -21,7 +21,6 @@ Required variables:
 
 ```env
 DATABASE_URL=""
-DIRECT_URL=""
 NEXTAUTH_URL=""
 NEXTAUTH_SECRET=""
 ADMIN_EMAIL=""
@@ -36,6 +35,7 @@ NEXT_PUBLIC_ENABLE_POSTERS="true"
 NEXT_PUBLIC_ENABLE_MUSIC="true"
 NEXT_PUBLIC_ENABLE_AI="false"
 
+STORAGE_DRIVER="local"
 NEXT_PUBLIC_SUPABASE_URL=""
 NEXT_PUBLIC_SUPABASE_ANON_KEY=""
 SUPABASE_SERVICE_ROLE_KEY=""
@@ -53,13 +53,16 @@ Keep `NEXT_PUBLIC_ENABLE_AI=false` if you want normal manual uploads only.
 
 ## Database
 
-Apply migrations:
+For local development, use SQLite:
 
 ```bash
-pnpm db:migrate
+DATABASE_URL="file:./dev.db"
+pnpm db:setup
 ```
 
-Seed the admin user and demo content:
+That creates or updates `prisma/dev.db` and seeds the admin user plus demo content.
+
+If you already have a database and only want to seed:
 
 ```bash
 pnpm db:seed
@@ -67,9 +70,15 @@ pnpm db:seed
 
 The seed script reads `ADMIN_EMAIL` and `ADMIN_PASSWORD`.
 
-## Supabase Storage
+## Storage
 
-Create a public Supabase Storage bucket matching `SUPABASE_STORAGE_BUCKET`.
+Local development uses `STORAGE_DRIVER=local`, which saves uploads under `public/uploads`.
+
+For production, use Supabase Storage:
+
+1. Set `STORAGE_DRIVER=supabase`.
+2. Create a public Supabase Storage bucket matching `SUPABASE_STORAGE_BUCKET`.
+3. Set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY`.
 
 The default example value is:
 
@@ -77,7 +86,21 @@ The default example value is:
 SUPABASE_STORAGE_BUCKET="minimal-list"
 ```
 
-Uploaded item, poster, and music cover images are stored in that bucket.
+Uploaded item, poster, and music cover images are stored locally or in that bucket, depending on `STORAGE_DRIVER`.
+
+## Postgres
+
+SQLite is intentionally the default so the template is easy to try. For production Postgres, use `prisma/schema.postgres.prisma`:
+
+```bash
+DATABASE_URL="postgresql://..."
+DIRECT_URL="postgresql://..."
+pnpm db:postgres:push
+pnpm db:postgres:seed
+pnpm build:postgres
+```
+
+On Vercel, set the build command to `pnpm build:postgres` after adding the Postgres and Supabase environment variables.
 
 ## Customization
 
@@ -89,12 +112,12 @@ Uploaded item, poster, and music cover images are stored in that bucket.
 
 ## Deploying
 
-The app is ready for Vercel. Set the environment variables in your Vercel project, then deploy from GitHub.
+The app is ready for Vercel. For production, set Postgres and Supabase environment variables in your Vercel project, then deploy from GitHub.
 
-For production databases, run migrations before or during deployment:
+For production databases, push the Postgres schema before or during deployment:
 
 ```bash
-pnpm db:migrate
+pnpm db:postgres:push
 ```
 
 ## Security
