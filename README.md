@@ -51,8 +51,7 @@ Next.js App Router, React, TypeScript, Tailwind CSS, Prisma, SQLite locally, Pos
 ## Quick Start
 
 ```bash
-cp .env.example .env
-pnpm setup
+pnpm run setup:local
 pnpm dev
 ```
 
@@ -71,8 +70,9 @@ This uses SQLite and local file uploads by default. Full setup notes are in [doc
 ## Scripts
 
 ```bash
-pnpm dev          # Start local dev server
+pnpm dev          # Start local dev server with NODE_ENV=development
 pnpm build        # Build for production
+pnpm setup:local  # Install deps, create/update local SQLite DB, and seed demo content
 pnpm lint         # Run ESLint
 pnpm typecheck    # Run TypeScript
 pnpm audit --prod # Check production dependency advisories

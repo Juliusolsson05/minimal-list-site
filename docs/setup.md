@@ -56,11 +56,10 @@ Keep `NEXT_PUBLIC_ENABLE_AI=false` if you want normal manual uploads only.
 For local development, use SQLite:
 
 ```bash
-DATABASE_URL="file:./dev.db"
-pnpm db:setup
+pnpm run setup:local
 ```
 
-That creates or updates `prisma/dev.db` and seeds the admin user plus demo content.
+That creates `.env` if needed, installs dependencies with `NODE_ENV=development`, creates or updates `prisma/dev.db`, and seeds the admin user plus demo content.
 
 If you already have a database and only want to seed:
 

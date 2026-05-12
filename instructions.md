@@ -55,8 +55,7 @@ No external services are required for the first local run.
 Run these commands from the repo root:
 
 ```bash
-cp .env.example .env
-pnpm setup
+pnpm run setup:local
 pnpm dev
 ```
 
@@ -121,8 +120,8 @@ Do not require Supabase values locally. Blank Supabase values are valid when `ST
 Use these commands:
 
 ```bash
-pnpm setup          # install deps, create/update SQLite DB, seed demo content
-pnpm dev            # start local dev server
+pnpm setup:local    # install deps, create/update SQLite DB, seed demo content
+pnpm dev            # start local dev server with NODE_ENV=development
 pnpm build          # production build using the default SQLite schema
 pnpm build:postgres # production build using the Postgres schema
 pnpm typecheck      # TypeScript check
@@ -464,12 +463,11 @@ For operational/admin UI, favor density and clarity over landing-page visuals.
 
 If the user says "set this up locally":
 
-1. Copy `.env.example` to `.env` if missing.
-2. Ensure `DATABASE_URL="file:./dev.db"`.
-3. Ensure `STORAGE_DRIVER="local"`.
-4. Ensure `NEXT_PUBLIC_ENABLE_AI="false"`.
-5. Run `pnpm setup`.
-6. Run `pnpm dev`.
+1. Run `pnpm run setup:local`; it copies `.env.example` to `.env` if needed, installs deps, creates/updates SQLite, and seeds demo data.
+2. Ensure `DATABASE_URL="file:./dev.db"` if the user edited `.env`.
+3. Ensure `STORAGE_DRIVER="local"` if the user edited `.env`.
+4. Ensure `NEXT_PUBLIC_ENABLE_AI="false"` if the user edited `.env`.
+5. Run `pnpm dev`.
 
 If the user says "make it mine":
 

@@ -30,18 +30,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-
   return (
     <html lang="en" className={inter.variable}>
-      <head>
-        {supabaseUrl && (
-          <>
-            <link rel="preconnect" href={supabaseUrl} />
-            <link rel="dns-prefetch" href={supabaseUrl} />
-          </>
-        )}
-      </head>
       <body className={inter.className}>
         <Providers>{children}</Providers>
       </body>
