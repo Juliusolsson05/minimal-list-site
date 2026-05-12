@@ -6,6 +6,21 @@ My own site using this template is [juliuslist.com](https://juliuslist.com).
 
 ![Screenshot of Julius List built with this template](public/readme/juliuslist-screenshot.png)
 
+## Why This Is Useful
+
+Most personal list sites are either too generic or too much work to maintain. This template is meant to be a practical middle ground: a clean place to keep track of things you like, want to buy, want to remember, or used to care about enough to archive.
+
+The core flow is simple: add an item, upload an image, write a short description, and organize it by category. If you want the site to stay fully manual, you can leave AI turned off and use it like a normal CMS.
+
+If you do enable AI, the admin has a few optional helpers:
+
+- **AI background removal / studio image generation**: when uploading an item image, you can check a box to turn a messy product photo into a cleaner white-background product-style image.
+- **Image filling and framing**: uploaded product photos are normalized into square listing images, so the grid stays visually consistent even when source images have different aspect ratios.
+- **Listing copy generation**: the AI item flow can draft a title, short tagline, price formatting, and description from an uploaded image and a few details.
+- **Poster processing**: poster uploads can be framed into a consistent poster presentation, with the original image preserved separately.
+
+All of this is optional. The template works fine without AI keys, and the feature flags let you hide AI or posters entirely.
+
 ## Features
 
 - Public item collection with categories and search
